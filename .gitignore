@@ -1,0 +1,12 @@
+.zcabs/
+*.pointer
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.pytest_cache/
+.mypy_cache/
+dist/
+*.egg-info/
+.DS_Store

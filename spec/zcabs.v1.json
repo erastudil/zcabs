@@ -1,0 +1,32 @@
+{
+  "name": "zcabs",
+  "version": "1.0.0",
+  "license": "AGPL-3.0-or-later",
+  "spec": "docs/SPEC.md",
+  "alias": ["zcahc"],
+  "headers": {
+    "LOOK": "absolute path to one file, or unavailable",
+    "FORMAT": "the {string} number is {integer}"
+  },
+  "pair": {
+    "line": "<string>=<integer>",
+    "integer_min": 100000,
+    "integer_max": 999999
+  },
+  "surfaces": {
+    "look": "print LOOK and FORMAT. never the integer",
+    "observe": "print string=integer for one key. unknown key does not list keys",
+    "verify": "host check. fail closed. do not echo expected integer",
+    "rotate": "re-seed one key in place",
+    "wrap": "run command; on success rotate canary and print LOOK",
+    "scan": "fail on store dir, pointer files, or live integers in a tree"
+  },
+  "defaults": {
+    "identity_string": "banana",
+    "capability": "canary",
+    "decoys_min": 16,
+    "home": "$ZCABS_HOME or ~/.zcabs"
+  },
+  "verify_accept": ["format", "pair", "zcabs_value"],
+  "verify_reject": ["empty", "bare_integer", "decoy", "mismatch", "missing_store"]
+}

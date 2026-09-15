@@ -1,0 +1,29 @@
+[project]
+name = "zcabs"
+version = "1.0.0"
+description = "Zero Correlation Anti-Bullshit System. LOOK/FORMAT retrieval. Fail closed."
+readme = "README.md"
+license = { text = "AGPL-3.0-or-later" }
+requires-python = ">=3.10"
+authors = [{ name = "Humans and AI" }]
+keywords = ["agents", "llm", "verification", "canary", "agpl"]
+classifiers = [
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/erastudil/zcabs"
+License = "https://github.com/erastudil/zcabs/blob/main/LICENSE"
+
+[project.scripts]
+zcabs = "zcabs.__main__:main"
+zcahc = "zcabs.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

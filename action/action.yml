@@ -1,0 +1,51 @@
+name: zcabs
+description: Scan a tree for zcabs store leaks, or verify a transcript.
+author: Humans and AI
+branding:
+  icon: shield
+  color: purple
+inputs:
+  mode:
+    description: scan or verify
+    required: false
+    default: scan
+  path:
+    description: tree to scan
+    required: false
+    default: .
+  transcript:
+    description: transcript file for verify mode
+    required: false
+  key:
+    description: pointer key for verify
+    required: false
+    default: canary
+  home:
+    description: ZCABS_HOME for live-integer scan and verify
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: install zcabs
+      shell: bash
+      run: pip install "${{ github.action_path }}/.."
+    - name: scan
+      if: inputs.mode == 'scan'
+      shell: bash
+      env:
+        ZCABS_HOME: ${{ inputs.home }}
+      run: zcabs scan "${{ inputs.path }}"
+    - name: verify
+      if: inputs.mode == 'verify'
+      shell: bash
+      env:
+        ZCABS_HOME: ${{ inputs.home }}
+      run: |
+        if [ -z "${{ inputs.transcript }}" ]; then
+          echo "ERROR: transcript is required for verify"
+          exit 2
+        fi
+        zcabs verify "${{ inputs.transcript }}" --key "${{ inputs.key }}"
