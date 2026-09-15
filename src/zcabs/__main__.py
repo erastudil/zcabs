@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None) -> int:
         description="zcabs LOOK/FORMAT retrieval. Fail closed. AGPL-3.0-or-later.",
     )
     parser.add_argument("--version", action="version", version=__version__)
-    sub = parser.add_subparsers(dest="cmd", required=True)
+    sub = parser.add_subparsers(dest="command", required=True)
 
     p_mint = sub.add_parser("mint", help="create a store. integers generated here")
     _home(p_mint)
@@ -63,32 +63,32 @@ def main(argv: list[str] | None = None) -> int:
     home = getattr(args, "home", None)
 
     try:
-        if args.cmd == "mint":
+        if args.command == "mint":
             return _cmd_mint(args)
-        if args.cmd == "look":
+        if args.command == "look":
             return _cmd_look(args.key, home)
-        if args.cmd == "observe":
+        if args.command == "observe":
             return _cmd_observe(args.key, home)
-        if args.cmd == "verify":
+        if args.command == "verify":
             return _cmd_verify(args)
-        if args.cmd == "rotate":
+        if args.command == "rotate":
             rotate(args.key, home)
             print("rotated")
             return 0
-        if args.cmd == "wrap":
+        if args.command == "wrap":
             cmd = list(args.cmd)
             if cmd and cmd[0] == "--":
                 cmd = cmd[1:]
             return wrap_command(cmd, home=home)
-        if args.cmd == "scan":
+        if args.command == "scan":
             return _cmd_scan(args.path, home)
-        if args.cmd == "prompt":
+        if args.command == "prompt":
             text = load_prompt("genome")
             sys.stdout.write(text)
             if not text.endswith("\n"):
                 sys.stdout.write("\n")
             return 0
-        if args.cmd == "check":
+        if args.command == "check":
             return run_check()
     except StoreError as e:
         print(str(e), file=sys.stderr)

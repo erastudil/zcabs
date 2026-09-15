@@ -1,26 +1,32 @@
-# boundary
+# Boundary
 
-this gift is the protocol and the tooling that make it usable. complete for that job.
+This repository defines the zcabs protocol and provides reference tooling for anti-hallucination execution proofs. This document defines what belongs in this repository and what remains strictly out of scope.
 
-## ships
+## In Scope
 
-| | |
+| Area | Included Components |
 |---|---|
-| protocol | LOOK/FORMAT. pair files. generated integers. decoys. rotate |
-| proof | wrap a command. verify a transcript. fail closed |
-| hygiene | scan a tree for store files and live integers |
-| prompts | drop-in genome. short |
-| tools | python cli · javascript module · github action |
-| license | AGPL-3.0-or-later. covenant in `COVENANT.md` |
+| **Protocol** | Normative specification for `LOOK:`, `FORMAT:`, pair files, dynamic integer generation, decoy generation, and rotation. |
+| **Verification** | Fail-closed transcript verification and post-execution command wrapping (`zcabs wrap`). |
+| **Leak Prevention** | Static tree scanner (`zcabs scan`) checking for store directories, pointer files, and active integers. |
+| **Agent Prompting** | Drop-in reference system prompts (`prompts/genome.md`) teaching observation and format compliance. |
+| **Tooling & Ports** | Python CLI reference suite, JavaScript runtime module (`js/zcabs.js`), and GitHub Actions workflow (`action/action.yml`). |
+| **Licensing** | AGPL-3.0-or-later governance and copyleft covenants (`COVENANT.md`). |
 
-`docs/SPEC.md` is the law. tools fail closed against it.
+[`docs/SPEC.md`](SPEC.md) is the normative specification. Tooling conforms to the specification and fails closed on discrepancy.
 
-## stays off this repo
+## Out of Scope
 
-house life. named house integers as identity. product genomes. mill control language. patent dictionary. private pools. an OS installer. a login shell. a desk. a browser product. human-only canvases. encrypted vaults. hell-filter command lists. live capability tables.
+The following concerns belong to external platforms, runtimes, and host applications, and must remain out of this repository:
 
-those have other homes. they are not required to implement zcabs. if a patch drags them in, reject the patch.
+- **OS Virtualization & Jails**: `zcabs` verifies observations; it does not replace operating system sandboxes, process isolation, chroots, or container virtualization.
+- **Daemon & Network Services**: `zcabs` is designed as a local filesystem protocol and CLI utility. It does not run network listeners or host remote execution daemons.
+- **Test Runner Re-implementation**: `zcabs wrap` wraps existing test frameworks (pytest, unittest, npm test, cargo test); it does not implement test runners or reporters.
+- **Static Capability Registries**: All capability and identity integers are generated dynamically at mint time. No static integer registries or persistent capability keys belong in source code or documentation.
+- **Model Training & Fine-Tuning**: No training scripts, dataset pipelines, or model adapters belong in this codebase.
 
-## completeness claim
+Pull requests that introduce out-of-scope abstractions or project-specific dependencies will be rejected.
 
-an implementer who has only this repository can mint, look, observe, verify, wrap, and scan. named sources of truth in SPEC are files in this tree. no private path is load-bearing.
+## Self-Contained Implementation
+
+An implementer working solely from this repository has everything necessary to mint stores, generate decoys, wrap command runs, verify transcripts, and scan codebases for leaks. All normative references in `docs/SPEC.md` point exclusively to files contained in this repository.

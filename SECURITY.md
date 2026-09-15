@@ -1,13 +1,21 @@
-# security
+# Security Policy
 
-this repository is a protocol, a local store, a verifier, a leak scanner, and a command wrapper.
+This repository provides protocol definitions, a local secret store, verification tooling, a secret leak scanner, and a command execution wrapper.
 
-the store holds generated integers. it lives in `$ZCABS_HOME` or `~/.zcabs`. do not commit it. do not log `observe` output into training data.
+## Store Security & Secret Management
 
-`look` and `scan` are safe to print. `observe` is retrieval. treat its output as secret.
+- The zcabs store contains cryptographically generated dynamic integers.
+- Stores reside in `$ZCABS_HOME` or `~/.zcabs`, strictly outside repository worktrees.
+- Never commit store files or pointer records to version control.
+- Do not log `observe` outputs or active integers into training datasets or persistent log aggregators.
+- `zcabs look` and `zcabs scan` outputs are safe to display. `zcabs observe` retrieves secret pairs; treat observed integers as sensitive verification credentials.
 
-this software does not listen on a network port.
+## Network Surface
 
-if you host a modified copy of the tooling as a network service, AGPL §13 requires you to offer corresponding source to the users of that service. `COVENANT.md`.
+This software does not open network listeners or run background network daemons.
 
-report issues on the github tracker. no bounty program.
+If you deploy modified versions of this tooling as part of a network service, AGPL §13 requires providing corresponding source code to users. See [`COVENANT.md`](COVENANT.md).
+
+## Reporting Vulnerabilities
+
+Report security issues through the GitHub repository issue tracker or security advisory panel. This project does not offer a monetary bug bounty program.

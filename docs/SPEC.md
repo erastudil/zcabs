@@ -29,7 +29,7 @@ The public part is the **string** and the **template**. The private part is the 
 
 ## 2. headers
 
-Machine protocol. Colon headers. Not a dialect of english.
+Machine protocol using colon-delimited headers.
 
 ```
 LOOK: <absolute path to one file>
@@ -140,7 +140,7 @@ Scan does not treat the FORMAT template as a leak. Scan does not treat the integ
 
 ## 8. agent genome
 
-The drop-in prompt is `prompts/genome.md`. It names LOOK, FORMAT, observe, and `DONT_KNOW`. It does not contain a live integer. It does not recite a ban list. Fail-closed lives in verify.
+The drop-in system prompt is `prompts/genome.md`. It specifies `LOOK:`, `FORMAT:`, `observe`, and the `DONT_KNOW` fallback. Live integers and verification rules remain host-side.
 
 ---
 

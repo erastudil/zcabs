@@ -67,6 +67,29 @@ class CliTests(unittest.TestCase):
         scanned = run_cli(["scan", str(ROOT)], self.home)
         self.assertEqual(scanned.returncode, 0, scanned.stdout + scanned.stderr)
 
+    def test_wrap_cli_success_and_failure(self):
+        run_cli(["mint"], self.home)
+        wrapped = run_cli(
+            ["wrap", "--", sys.executable, "-c", "print('worker finished')"],
+            self.home,
+        )
+        self.assertEqual(wrapped.returncode, 0, wrapped.stderr)
+        self.assertIn("LOOK:", wrapped.stdout)
+        self.assertIn("FORMAT:", wrapped.stdout)
+
+        name, val = run_cli(["observe", "canary"], self.home).stdout.strip().split("=")
+        spoken = f"the {name} number is {val}\n"
+        verified = run_cli(["verify", "-", "--key", "canary"], self.home, input_text=spoken)
+        self.assertEqual(verified.returncode, 0, verified.stdout)
+        self.assertIn("PASS", verified.stdout)
+
+        failed = run_cli(
+            ["wrap", "--", sys.executable, "-c", "import sys; sys.exit(5)"],
+            self.home,
+        )
+        self.assertEqual(failed.returncode, 5)
+        self.assertNotIn("LOOK:", failed.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
