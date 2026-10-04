@@ -11,7 +11,7 @@ license: AGPL-3.0-or-later
 
 ## Installation & Basic Usage
 
-Requires Python 3.10+ (standard library only).
+Requires Python 3.10+ // standard library only.
 
 ```bash
 # Editable install
@@ -98,8 +98,8 @@ zcabs wrap -- cargo test
 ```
 
 The command executes in the current working directory.
-- On failure (non-zero exit code), `wrap` exits with the command's exit code without printing protocol headers.
-- On success (exit code 0), `wrap` rotates the `canary` integer and appends the updated `LOOK:` and `FORMAT:` headers to standard output.
+- On failure // non-zero exit code // `wrap` exits with the command's exit code without printing protocol headers.
+- On success // exit code 0 // `wrap` rotates the `canary` integer and appends the updated `LOOK:` and `FORMAT:` headers to standard output.
 
 Always verify candidate responses against the entire transcript rather than model-authored summaries.
 
@@ -126,12 +126,47 @@ Store verification runs on the host that minted the store; store directories mus
 
 ---
 
-## 5. JavaScript / Node.js Implementation
+## 5. Programmatic Harness Integration
+
+Evaluation harnesses and automated test benches use `zcabs.Harness` to manage ephemeral stores:
+
+```python
+import zcabs
+
+with zcabs.Harness() as h:
+    # Pass ZCABS_HOME to subshells or agent containers
+    env = h.env()
+
+    # Retrieve LOOK header for prompt injection
+    look_block = h.look("canary")
+
+    # Wrap test commands
+    wrap_res = h.wrap(["pytest", "-q"])
+    if not wrap_res.ok:
+        raise RuntimeError("tests failed")
+
+    # Verify transcript file or text
+    ver_res = h.verify(agent_text, key="canary")
+    if not ver_res.ok:
+        raise AssertionError(ver_res.reason)
+```
+
+CLI flags optimize execution inside bash or CI harness scripts:
+
+- Pass candidate text directly: `zcabs verify -t "$AGENT_OUTPUT" --key canary`
+- Silence console output for status-code checking: `zcabs verify -t "$AGENT_OUTPUT" -q`
+- Output structured results: `zcabs verify -t "$AGENT_OUTPUT" --json`
+- Direct wrapped look header to a file: `zcabs wrap --look-file /tmp/look.txt -q -- pytest -q`
+
+---
+
+## 6. JavaScript / Node.js Implementation
 
 [`js/zcabs.js`](../js/zcabs.js) provides a standalone JavaScript implementation of the protocol.
 - Default: In-memory store (`createMemoryIO()`).
 - Filesystem: Node.js filesystem adapter (`createFsIO()`).
 - LOOK targets reference filesystem paths or memory keys.
+- Harness: In-memory test environment (`createHarness()`).
 
 Run Node.js conformance tests:
 
@@ -141,7 +176,7 @@ node --test js/zcabs.test.js
 
 ---
 
-## 6. Reserved Headers
+## 7. Reserved Headers
 
 `LOOK:` and `FORMAT:` are reserved protocol headers. Place each header on its own line. Do not combine them with other colon-delimited text on the same line.
 
@@ -149,11 +184,11 @@ For dialect integration with [progen](https://github.com/erastudil/progen), keep
 
 ---
 
-## 7. Host Hardening
+## 8. Host Hardening
 
 `zcabs` provides proof of observation; it does not replace process sandboxing:
 
-- Store home directory permissions must be restricted (mode `0700` for directories, `0600` for secret files).
+- Store home directory permissions must be restricted: mode `0700` for directories, `0600` for secret files.
 - Do not mount the store directory into container environments where agents can list directory contents.
 - Do not record `observe` output into persistent training datasets.
 - Rotate capability integers after privileged operations.

@@ -44,7 +44,32 @@ the canary number is 847291
 Verify the agent transcript against the store:
 
 ```bash
+# Verify transcript file
 zcabs verify transcript.txt --key canary
+
+# Or verify candidate string directly
+zcabs verify -t "$AGENT_RESPONSE" --key canary
 ```
 
 The command exits with 0 on matching retrieval, confirming that the tests passed.
+
+## 4. Programmatic Evaluation Harness
+
+In an automated Python eval harness:
+
+```python
+import zcabs
+
+with zcabs.Harness() as h:
+    # 1. Provide prompt instruction
+    system_prompt = f"{h.genome_prompt()}\n\n{h.look('canary')}"
+
+    # 2. Wrap verification command
+    res = h.wrap(["pytest", "-q"])
+    assert res.ok
+
+    # 3. Verify model output
+    verification = h.verify(model_response, key="canary")
+    assert verification.ok, verification.reason
+```
+

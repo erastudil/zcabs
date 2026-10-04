@@ -16,6 +16,9 @@ inputs:
   transcript:
     description: transcript file for verify mode
     required: false
+  text:
+    description: candidate text directly for verify mode
+    required: false
   key:
     description: pointer key for verify
     required: false
@@ -44,8 +47,11 @@ runs:
       env:
         ZCABS_HOME: ${{ inputs.home }}
       run: |
-        if [ -z "${{ inputs.transcript }}" ]; then
-          echo "ERROR: transcript is required for verify"
+        if [ -n "${{ inputs.text }}" ]; then
+          zcabs verify -t "${{ inputs.text }}" --key "${{ inputs.key }}"
+        elif [ -n "${{ inputs.transcript }}" ]; then
+          zcabs verify "${{ inputs.transcript }}" --key "${{ inputs.key }}"
+        else
+          echo "ERROR: transcript or text is required for verify"
           exit 2
         fi
-        zcabs verify "${{ inputs.transcript }}" --key "${{ inputs.key }}"

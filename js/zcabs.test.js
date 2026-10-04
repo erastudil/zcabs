@@ -8,6 +8,7 @@ import path from "node:path";
 import {
   FORMAT_TEMPLATE,
   createFsIO,
+  createHarness,
   createMemoryIO,
   emitLook,
   formatSpoken,
@@ -76,3 +77,22 @@ test("memory io is the default", () => {
   const store = mint({ io });
   assert.equal(store.io, io);
 });
+
+test("createHarness provides look observe verify wrap", () => {
+  const h = createHarness();
+  const lookBlock = h.look("identity");
+  assert.equal(lookBlock.includes(FORMAT_TEMPLATE), true);
+  const expected = h.formatExpected("identity");
+  assert.equal(h.verify(expected, "identity").ok, true);
+
+  const wrapFail = h.wrap(() => 42, "canary");
+  assert.equal(wrapFail.ok, false);
+  assert.equal(wrapFail.exitCode, 42);
+
+  const wrapSuccess = h.wrap(() => 0, "canary");
+  assert.equal(wrapSuccess.ok, true);
+  assert.equal(wrapSuccess.look.includes("LOOK:"), true);
+  const canaryExpected = h.formatExpected("canary");
+  assert.equal(h.verify(canaryExpected, "canary").ok, true);
+});
+

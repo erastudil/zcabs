@@ -10,7 +10,6 @@ from pathlib import Path
 
 from .store import StoreError, ensure_cap, look, mint, rotate, store_exists
 
-
 CANARY = "canary"
 
 
@@ -20,6 +19,9 @@ def wrap_command(
     stdin=None,
     stdout=None,
     stderr=None,
+    key: str = CANARY,
+    look_file: Path | str | None = None,
+    quiet: bool = False,
 ) -> int:
     if not argv:
         print("ERROR: wrap needs a command", file=stderr or sys.stderr)
@@ -32,10 +34,18 @@ def wrap_command(
         if not store_exists(home):
             mint(home)
             print("zcabs: minted default store", file=err)
-        ensure_cap(CANARY, home)
+        ensure_cap(key, home)
     except StoreError as e:
         print(str(e), file=err)
         return 2
+
+    if look_file is not None:
+        try:
+            lf_path = Path(look_file).expanduser().resolve()
+            if lf_path.is_file():
+                lf_path.unlink()
+        except OSError:
+            pass
 
     cmd = list(argv)
     executable = shutil.which(cmd[0]) or cmd[0]
@@ -51,13 +61,24 @@ def wrap_command(
         return 126
 
     try:
-        rotate(CANARY, home)
-        block = look(CANARY, home)
+        rotate(key, home)
+        block = look(key, home)
     except StoreError as e:
         print(str(e), file=err)
         return 2
 
     if not block.endswith("\n"):
         block += "\n"
-    out.write(block)
+
+    if look_file is not None:
+        try:
+            lf_path = Path(look_file).expanduser().resolve()
+            lf_path.parent.mkdir(parents=True, exist_ok=True)
+            lf_path.write_text(block, encoding="utf-8")
+        except OSError as e:
+            print(f"ERROR: failed to write look file: {e}", file=err)
+            return 2
+
+    if not quiet:
+        out.write(block)
     return 0

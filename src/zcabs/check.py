@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Conformance: mint, look leaks nothing, observe+verify, rotate, scan."""
+"""Conformance: mint, look leaks nothing, observe+verify, rotate, scan, harness."""
 
 from __future__ import annotations
 
+import json
 import tempfile
 from pathlib import Path
 
 from .protocol import FORMAT_TEMPLATE, format_spoken, parse_look_block
 from .scan import scan_tree
 from .store import look, mint, observe, rotate
-from .verify import verify_text
+from .verify import verify_file, verify_text
 
 
-def run_check() -> int:
+def run_check(quiet: bool = False, as_json: bool = False) -> int:
     errors: list[str] = []
 
     def fail(msg: str) -> None:
@@ -38,6 +39,12 @@ def run_check() -> int:
         ok = verify_text(spoken, "identity", home)
         if not ok.ok:
             fail("verify rejected true FORMAT")
+
+        # verify_file conformance
+        vf_path = root / "candidate.txt"
+        vf_path.write_text(spoken + "\n", encoding="utf-8")
+        if not verify_file(vf_path, "identity", home).ok:
+            fail("verify_file rejected true FORMAT")
 
         bad = verify_text(format_spoken(name, value + 1 if value < 999_999 else value - 1), "identity", home)
         if bad.ok:
@@ -86,9 +93,24 @@ def run_check() -> int:
         if not any(f.kind == "pointer" for f in ptr):
             fail("scan missed pointer file")
 
+        # Conformance check for harness
+        from .harness import Harness
+        with Harness() as h:
+            if "ZCABS_HOME" not in h.env():
+                fail("harness env missing ZCABS_HOME")
+            h_name, h_val = h.observe("identity")
+            if not h.verify(format_spoken(h_name, h_val), "identity").ok:
+                fail("harness verify failed on valid candidate")
+
+    if as_json:
+        print(json.dumps({"ok": len(errors) == 0, "errors": errors}))
+        return 0 if not errors else 1
+
     if errors:
-        for e in errors:
-            print(f"FAIL: {e}")
+        if not quiet:
+            for e in errors:
+                print(f"FAIL: {e}")
         return 1
-    print("PASS")
+    if not quiet:
+        print("PASS")
     return 0

@@ -251,3 +251,32 @@ export function createFsIO(fs, pathMod, home) {
     join: (...parts) => pathMod.join(...parts),
   };
 }
+
+export function createHarness(options = {}) {
+  const store = mint(options);
+  return {
+    store,
+    look: (key = "identity") => look(store, key),
+    observe: (key = "identity") => observe(store, key),
+    rotate: (key = "canary") => rotate(store, key),
+    verify: (text, key = "canary") => verify(store, text, key),
+    formatExpected: (key = "identity") => {
+      const pair = observe(store, key);
+      return formatSpoken(pair.string, pair.integer);
+    },
+    wrap: (commandFn, key = "canary") => {
+      let res;
+      try {
+        res = commandFn();
+      } catch (err) {
+        return { ok: false, exitCode: 1, error: err };
+      }
+      if (res === 0 || res === true || res === undefined) {
+        rotate(store, key);
+        return { ok: true, exitCode: 0, look: look(store, key) };
+      }
+      return { ok: false, exitCode: typeof res === "number" ? res : 1 };
+    },
+  };
+}
+

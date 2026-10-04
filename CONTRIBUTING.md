@@ -6,13 +6,13 @@ Contributions are welcome. All contributions must preserve the project's copylef
 
 All contributions are licensed under **AGPL-3.0-or-later**. By submitting a patch, you certify that you have the right to submit the work under this license.
 
-Every commit must include a Developer Certificate of Origin (DCO) sign-off line:
+Every commit must include a Developer Certificate of Origin sign-off line:
 
 ```text
 Signed-off-by: Your Name <your.email@example.com>
 ```
 
-Copyright remains with the individual authors. No Contributor License Agreements (CLAs) requiring copyright assignment are accepted. Pull requests proposing proprietary relicensing or commercial exemptions are rejected.
+Copyright remains with the individual authors. No Contributor License Agreements requiring copyright assignment are accepted. Pull requests proposing proprietary relicensing or commercial exemptions are rejected.
 
 ## Testing & Verification
 

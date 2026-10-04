@@ -1,48 +1,27 @@
 # zcabs
 
-Language models interpolate context. An agent can claim "all tests passed" without running a single command. It can repeat a confirmation code if that code was already in the prompt. When proof of execution lives entirely in the conversation context, the proof costs nothing to fake.
+Language models interpolate context. An agent can claim all tests passed without running a single command. It can repeat a confirmation token if that token was already in the prompt. When proof of execution lives entirely in the conversation context, the proof costs nothing to fake.
 
 **zcabs** turns proof of execution into a real-world observation.
 
-The host generates a unique integer and stores it in an isolated local file. The agent receives only the file path and the required output format. To prove it completed the work, the agent must inspect the file and speak the value. Guessing fails. Reading an empty path fails. Quoting a static number from documentation fails because live numbers are generated dynamically per installation and task.
+The host generates a unique integer and stores it in an isolated local file. The agent receives only the target file path and the required output format. To prove it completed the work, the agent must inspect the file and speak the value. Guessing fails. Reading an empty path fails. Quoting a static number from documentation fails because live numbers are generated dynamically per installation and task.
 
-Zero Correlation Anti-Bullshit System. AGPL-3.0-or-later. See [`LICENSE`](LICENSE) and [`COVENANT.md`](COVENANT.md).
+The license is AGPL-3.0-or-later. See [`LICENSE`](LICENSE) and [`COVENANT.md`](COVENANT.md).
 
-## Quickstart
+[progen](https://github.com/erastudil/progen) is how an agent thinks. [gfc](https://github.com/erastudil/gfc) is how it writes for humans. This is how it proves execution.
 
-Run tests and conformance checks directly from a repository checkout:
+---
 
-```bash
-# Run unit tests
-python -m unittest discover -s tests -v
+## How the protocol works
 
-# Run protocol conformance check (local checkout)
-PYTHONPATH=src python -m zcabs check
-```
-
-Install as an editable package:
-
-```bash
-python -m pip install -e .
-
-# Conformance and CLI inspection
-zcabs check
-zcabs mint
-zcabs look
-```
-
-Requires Python 3.10+ (standard library only).
-
-## The Protocol
-
-The host provides two lines to the model:
+The host emits two reserved headers to the model:
 
 ```text
 LOOK: /absolute/path/to/one/file
 FORMAT: the {string} number is {integer}
 ```
 
-The model reads the target file and speaks the formatted phrase. Live integers are never placed in system prompts, repository files, or documentation.
+The model reads the target file and speaks the formatted phrase. Live integers never appear in system prompts, repository files, or documentation.
 
 Wrap commands to verify execution automatically:
 
@@ -50,7 +29,7 @@ Wrap commands to verify execution automatically:
 zcabs wrap -- pytest -q
 ```
 
-When the command exits with code 0, `zcabs wrap` rotates the `canary` capability and emits the `LOOK:` and `FORMAT:` headers on standard output. The resulting canary proves that the command ran to completion.
+When the command exits with code 0, `zcabs wrap` rotates the canary capability and prints the `LOOK:` and `FORMAT:` headers to standard output. The resulting canary proves that the command ran to completion.
 
 Scan a repository to verify no stores or live integers have leaked into source files:
 
@@ -60,7 +39,39 @@ zcabs scan .
 
 `scan` exits with code 0 on a clean tree and non-zero if store directories, pointer files, or live store integers are detected.
 
-## CLI Reference
+---
+
+## Setup and self-check
+
+Runtime requirements: Python 3.10+ using only standard library modules.
+
+```bash
+# editable package install
+python -m pip install -e .
+
+# run protocol conformance check
+zcabs check
+```
+
+Running straight from the repository tree:
+
+```bash
+# unix
+PYTHONPATH=src python -m zcabs check
+
+# powershell
+$env:PYTHONPATH = "src"
+python -m zcabs check
+
+# run full test suite
+python -m unittest discover -s tests -v
+```
+
+---
+
+## CLI commands
+
+Inspect, mint, verify, and wrap operations:
 
 ```bash
 zcabs mint [--identity banana] [--cap NAME ...] [--force]
@@ -75,11 +86,49 @@ zcabs check
 ```
 
 - `look`: prints the target file path and required format template without exposing the integer.
-- `observe`: retrieves the active `string=integer` pair for a key (used by tools or hosts).
+- `observe`: retrieves the active `string=integer` pair for a key // used by tools or hosts.
 - `verify`: compares candidate text against the store; fails closed without echoing expected integers.
 - `wrap`: executes a command and, upon exit code 0, rotates `canary` and prints the updated `LOOK:` block.
 - `scan`: scans directory trees for store paths, pointer files, and leaked integers.
 - CLI alias: `zcahc`.
+
+---
+
+## Programmatic harness usage
+
+In Python test runners and evaluation harnesses:
+
+```python
+import zcabs
+
+# Ephemeral store managed via context manager
+with zcabs.Harness() as h:
+    # Environment mapping for child processes
+    env = h.env()
+
+    # Prompt header for the agent
+    look_block = h.look("canary")
+
+    # Run command through wrapper
+    wrap_result = h.wrap(["pytest", "-q"])
+    assert wrap_result.ok
+
+    # Verify agent transcript
+    result = h.verify("the canary number is 123456", key="canary")
+
+    # Scan project tree for leaks
+    findings = h.scan(".")
+    assert not findings
+```
+
+CLI flags for automated harnesses:
+
+- `--json`: machine-readable JSON output on `mint`, `look`, `observe`, `verify`, `rotate`, `wrap`, `scan`, and `check`.
+- `-q`, `--quiet`: suppress stdout, returning exit code only // exit 0 on success, 1 on invariant failure.
+- `-t`, `--text`: pass candidate text directly to `zcabs verify` without creating intermediate files.
+- `--look-file`: write the post-wrap `LOOK:` block directly to a specified file path.
+
+---
 
 ## Documentation
 
@@ -90,13 +139,5 @@ zcabs check
 | [`docs/BOUNDARY.md`](docs/BOUNDARY.md) | Repository scope and technical boundaries |
 | [`prompts/genome.md`](prompts/genome.md) | Drop-in agent system prompt |
 | [`spec/zcabs.v1.json`](spec/zcabs.v1.json) | Machine-readable specification schema |
-
-## Copyleft & Covenant
-
-Using `LOOK:` and `FORMAT:` headers in prompts is standard protocol usage. Incorporating the specification, prompts, or reference implementations into derivative works requires AGPL-3.0-or-later licensing. Network services providing modified versions of these tools owe their users the corresponding source code under AGPL §13.
-
-No dual-licensing. No corporate copyright assignment. Free software forever. See [`COVENANT.md`](COVENANT.md).
-
-## Contributing
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). Contributions require Developer Certificate of Origin (DCO) sign-off and tests matching `docs/SPEC.md`. Keep changes focused strictly on the protocol and tooling.
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Guidelines for patches, DCO sign-offs, and test rules |
+| [`COVENANT.md`](COVENANT.md) | Un-enclosure commitment and AGPL copyleft terms |

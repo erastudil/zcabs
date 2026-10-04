@@ -21,7 +21,7 @@ The following concerns belong to external platforms, runtimes, and host applicat
 
 - **OS Virtualization & Jails**: `zcabs` verifies observations; it does not replace operating system sandboxes, process isolation, chroots, or container virtualization.
 - **Daemon & Network Services**: `zcabs` is designed as a local filesystem protocol and CLI utility. It does not run network listeners or host remote execution daemons.
-- **Test Runner Re-implementation**: `zcabs wrap` wraps existing test frameworks (pytest, unittest, npm test, cargo test); it does not implement test runners or reporters.
+- **Test Runner Re-implementation**: `zcabs wrap` wraps existing test frameworks like pytest, unittest, npm test, and cargo test; it does not implement test runners or reporters.
 - **Static Capability Registries**: All capability and identity integers are generated dynamically at mint time. No static integer registries or persistent capability keys belong in source code or documentation.
 - **Model Training & Fine-Tuning**: No training scripts, dataset pipelines, or model adapters belong in this codebase.
 

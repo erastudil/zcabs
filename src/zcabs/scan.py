@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,6 +19,10 @@ SKIP_DIRS = {
     "node_modules",
     ".mypy_cache",
     ".pytest_cache",
+    ".ruff_cache",
+    ".tox",
+    ".eggs",
+    "build",
     "dist",
 }
 
@@ -48,12 +53,17 @@ TEXT_SUFFIXES = {
     ".dat",
 }
 
+_SIX_DIGIT_RE = re.compile(r"(?<!\d)(\d{6})(?!\d)")
+
 
 @dataclass(frozen=True)
 class Finding:
     kind: str
     path: str
     detail: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {"kind": self.kind, "path": self.path, "detail": self.detail}
 
 
 def scan_tree(root: Path | str, home: Path | str | None = None) -> list[Finding]:
@@ -74,7 +84,7 @@ def scan_tree(root: Path | str, home: Path | str | None = None) -> list[Finding]
 
     findings: list[Finding] = []
     for dirpath, dirnames, filenames in os.walk(base):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.endswith(".egg-info")]
         here = Path(dirpath)
         if here.name == ".zcabs":
             findings.append(Finding("store-dir", str(here), "committed store directory"))
@@ -109,11 +119,12 @@ def _scan_file(path: Path, live: set[int]) -> list[Finding]:
     except (OSError, UnicodeDecodeError):
         return out
     if live:
-        for n in live:
-            if not is_live_integer(n):
-                continue
-            if _contains_int(text, n):
-                out.append(Finding("leak", str(path), str(n)))
+        seen: set[int] = set()
+        for m in _SIX_DIGIT_RE.finditer(text):
+            val = int(m.group(1))
+            if val in live and val not in seen and is_live_integer(val):
+                seen.add(val)
+                out.append(Finding("leak", str(path), str(val)))
     return out
 
 

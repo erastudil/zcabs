@@ -4,9 +4,9 @@
 
 This repository is dedicated to free, un-enclosed developer tooling. The project operates under the following standing covenants:
 
-- The official distribution remains free ($0) forever.
+- The official distribution remains free forever.
 - No corporate board seats or corporate governance steering this repository.
-- Copyright remains with the respective authors under the Developer Certificate of Origin (DCO). The project does not accept Contributor License Agreements (CLAs) requiring copyright assignment.
+- Copyright remains with the respective authors under the Developer Certificate of Origin. The project does not accept Contributor License Agreements requiring copyright assignment.
 - An independent, clean-room implementation based on [`docs/SPEC.md`](docs/SPEC.md) belongs entirely to its author.
 - Incorporating this specification, prompts, or reference implementations into derivative works is governed by the AGPL-3.0-or-later.
 - Any network service deploying modified versions of these covered works must provide corresponding source code to users under AGPL §13.
@@ -19,7 +19,7 @@ The files in this repository constitute the Program. The markdown specifications
 
 If you deploy modified versions of `prompts/genome.md`, the verifier, or the wrapper as part of an externally facing network service, you are conveying a covered work. You must make the corresponding source code available to the users of that service under AGPL §13.
 
-Dual-licensing schemes (e.g. commercial exceptions) and proprietary license re-assignments are rejected.
+Dual-licensing schemes and proprietary license re-assignments are rejected.
 
 ## Technical Independence
 
