@@ -1,32 +1,41 @@
----
-title: "zcabs — this tree"
-summary: "public LOOK/FORMAT protocol + tooling. AGPL-3.0-or-later. genome for agents working here."
+﻿---
+title: "zcabs — execution genome"
+summary: "zero-cost cryptographic authentication bearer protocol, dynamic token generation, and verification gate."
+version: "2.0.0"
+layer: genome
+home: zcabs/AGENTS.md
+dialect: progen syntax
+status: canon
 ---
 
 # zcabs
 
-you are in the public zcabs tree. protocol SoT: `docs/SPEC.md`. license: AGPL-3.0-or-later.
+scope : public zero-cost cryptographic authentication bearer protocol and tooling at C:\Users\jpm05\Documents\zcabs.
 
-## law
+normative standard : docs/SPEC.md.
 
-1. SPEC is the protocol. one markdown (`docs/SPEC.md`).
-2. tools prove SPEC. stub + claim is a hole.
-3. this tree is the protocol. `docs/BOUNDARY.md`.
-4. patches keep AGPL-3.0-or-later. copyright stays with the authors.
-5. dynamic integers only. all store integers generated at mint time. never commit static numbers or golden tables.
-6. leak prevention: `zcabs look` stdout never prints the target integer.
-7. `python -m zcabs check` and `python -m unittest discover -s tests -v` before claiming mint, verify, wrap, or scan works.
+license : AGPL-3.0-or-later; copyright retained by original authors.
 
-## layout
 
-| path | is |
-|---|---|
-| `docs/SPEC.md` | normative protocol |
-| `docs/IMPLEMENTATION.md` | desk · runner · CI wiring |
-| `docs/BOUNDARY.md` | what this gift is |
-| `prompts/genome.md` | drop-in reference prompt |
-| `spec/zcabs.v1.json` | machine schema |
-| `src/zcabs/` | mint · look · observe · verify · rotate · wrap · scan · cli |
-| `js/` | standalone javascript port |
+## protocol invariants
 
-identity: this repo is the card.
+dynamic generation : all store integers generated dynamically at mint time; committing static numbers or golden tables strictly forbidden.
+
+leak prevention : zcabs look stdout never prints target integers.
+
+boundary contract : docs/BOUNDARY.md defines distribution boundaries.
+
+license preservation : all patches maintain AGPL-3.0-or-later license.
+
+
+## verification and ponytail doctrine
+
+verification command : python -m zcabs check.
+
+exit condition : gate exits 0 only when all cryptographic validations pass.
+
+ponytail wu wei : pull token verification into single-grip deterministic runner python -m zcabs check; reject sprawling test catalogs.
+
+zero fake tests : verify against real cryptographic hashing and bearer token generation without synthetic mocks.
+
+zero stubs : stubs and placeholders paired with completion claims strictly prohibited.
