@@ -28,13 +28,13 @@ boundary contract : docs/BOUNDARY.md defines distribution boundaries.
 license preservation : all patches maintain AGPL-3.0-or-later license.
 
 
-## verification and ponytail doctrine
+## verification and wuwei doctrine
 
 verification command : python -m zcabs check.
 
 exit condition : gate exits 0 only when all cryptographic validations pass.
 
-ponytail wu wei : pull token verification into single-grip deterministic runner python -m zcabs check; reject sprawling test catalogs.
+wuwei wu wei : pull token verification into single-grip deterministic runner python -m zcabs check; reject sprawling test catalogs.
 
 zero fake tests : verify against real cryptographic hashing and bearer token generation without synthetic mocks.
 
