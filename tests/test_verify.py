@@ -33,6 +33,16 @@ class VerifyTests(unittest.TestCase):
         result = verify_text(f"{self.name}={self.value}", "identity", self.home)
         self.assertTrue(result.ok)
 
+    def test_zcabs_value_format_passes(self):
+        result = verify_text(f"ZCABS_VALUE: {self.value}", "identity", self.home)
+        self.assertTrue(result.ok)
+        self.assertEqual(result.extracted, self.value)
+
+    def test_zcabs_value_eq_passes(self):
+        result = verify_text(f"zcabs_value={self.value}", "identity", self.home)
+        self.assertTrue(result.ok)
+        self.assertEqual(result.extracted, self.value)
+
     def test_wrong_integer_fails_without_echo(self):
         wrong = self.value + 1 if self.value < 999999 else self.value - 1
         result = verify_text(format_spoken(self.name, wrong), "identity", self.home)

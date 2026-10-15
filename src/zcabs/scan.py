@@ -85,17 +85,18 @@ def scan_tree(root: Path | str, home: Path | str | None = None) -> list[Finding]
     findings: list[Finding] = []
     for dirpath, dirnames, filenames in os.walk(base):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS and not d.endswith(".egg-info")]
-        here = Path(dirpath)
+        here = Path(dirpath).resolve()
+        if home_path is not None:
+            try:
+                here.relative_to(home_path)
+                dirnames[:] = []
+                continue
+            except ValueError:
+                pass
         if here.name == ".zcabs":
             findings.append(Finding("store-dir", str(here), "committed store directory"))
             dirnames[:] = []
             continue
-        if home_path is not None:
-            try:
-                here.relative_to(home_path)
-                continue
-            except ValueError:
-                pass
         for name in filenames:
             path = here / name
             findings.extend(_scan_file(path, live))

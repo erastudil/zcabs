@@ -52,6 +52,22 @@ class ScanTests(unittest.TestCase):
         findings = scan_tree(self.proj, home=self.home)
         self.assertTrue(any(f.kind == "store-dir" for f in findings))
 
+    def test_store_home_at_dot_zcabs_excluded_while_committed_dir_flagged(self):
+        with tempfile.TemporaryDirectory() as td:
+            td_root = Path(td).resolve()
+            dot_home = (td_root / ".zcabs").resolve()
+            mint(dot_home)
+            p = (td_root / "proj").resolve()
+            p.mkdir()
+            (p / "test.py").write_text("print('clean')\n", encoding="utf-8")
+            committed = (p / "nested" / ".zcabs").resolve()
+            committed.mkdir(parents=True)
+            (committed / "pointer").write_text("identity=/tmp/fake\n", encoding="utf-8")
+            findings = scan_tree(td_root, home=dot_home)
+            self.assertEqual(len(findings), 1)
+            self.assertEqual(findings[0].kind, "store-dir")
+            self.assertEqual(Path(findings[0].path).resolve(), committed)
+
 
 if __name__ == "__main__":
     unittest.main()

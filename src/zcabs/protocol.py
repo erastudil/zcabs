@@ -98,6 +98,9 @@ def extract_spoken(text: str, expected_string: str | None = None) -> list[Spoken
     if expected_string:
         for m in _VALUE_RE.finditer(text):
             add(expected_string, int(m.group(1)), "zcabs_value")
+    else:
+        for m in _VALUE_RE.finditer(text):
+            add("zcabs_value", int(m.group(1)), "zcabs_value")
 
     if expected_string:
         want = expected_string.lower()
