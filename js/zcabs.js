@@ -2,6 +2,7 @@
 // zcabs protocol. Memory store by default. Inject io for files.
 
 export const FORMAT_TEMPLATE = "the {string} number is {integer}";
+export const LOOK_UNAVAILABLE = "unavailable";
 export const INT_MIN = 100000;
 export const INT_MAX = 999999;
 export const DECOY_COUNT = 16;
@@ -26,8 +27,15 @@ export function formatSpoken(string, integer) {
   return `the ${string} number is ${integer}`;
 }
 
+export function pairLine(key, value) {
+  if (!isLiveInteger(value)) {
+    throw new Error("integer outside live range");
+  }
+  return `${key}=${value}\n`;
+}
+
 export function emitLook(target) {
-  return `LOOK: ${target || "unavailable"}\nFORMAT: ${FORMAT_TEMPLATE}`;
+  return `LOOK: ${target || LOOK_UNAVAILABLE}\nFORMAT: ${FORMAT_TEMPLATE}`;
 }
 
 export function parsePair(text) {
@@ -204,7 +212,7 @@ export function verify(store, text, key) {
   return { ok: false, reason: "ERROR: invariant failed. candidate does not match store." };
 }
 
-export function extractSpoken(text, expectedString) {
+export function extractSpoken(text, expectedString = null) {
   const found = [];
   const seen = new Set();
   function add(string, integer, form) {
@@ -214,13 +222,16 @@ export function extractSpoken(text, expectedString) {
     seen.add(id);
     found.push({ string, integer, form });
   }
-  for (const m of text.matchAll(SPOKEN)) add(m[1], Number(m[2]), "format");
-  for (const m of text.matchAll(KEY_EQ)) add(m[1], Number(m[2]), "pair");
+  const source = String(text || "");
+  for (const m of source.matchAll(SPOKEN)) add(m[1], Number(m[2]), "format");
+  for (const m of source.matchAll(KEY_EQ)) add(m[1], Number(m[2]), "pair");
   if (expectedString) {
-    for (const m of text.matchAll(VALUE)) add(expectedString, Number(m[1]), "zcabs_value");
+    for (const m of source.matchAll(VALUE)) add(expectedString, Number(m[1]), "zcabs_value");
     const want = expectedString.toLowerCase();
     const preferred = found.filter((s) => s.string.toLowerCase() === want);
     if (preferred.length) return preferred;
+  } else {
+    for (const m of source.matchAll(VALUE)) add("zcabs_value", Number(m[1]), "zcabs_value");
   }
   return found;
 }

@@ -70,6 +70,19 @@ class DocsLint(unittest.TestCase):
                 msg=f"{rel}: GFC lint findings: {findings}",
             )
 
+    def test_genome_fallback_and_version_parity(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        src = root / "src"
+        if str(src) not in sys.path:
+            sys.path.insert(0, str(src))
+        from zcabs import __version__
+        from zcabs.prompt import _GENOME_FALLBACK
+
+        genome_text = (root / "prompts" / "genome.md").read_text(encoding="utf-8")
+        self.assertEqual(_GENOME_FALLBACK, genome_text)
+        pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
+        self.assertIn(f'version = "{__version__}"', pyproject)
+
 
 if __name__ == "__main__":
     unittest.main()
