@@ -2,7 +2,17 @@
 """zcabs: LOOK/FORMAT retrieval. Fail closed."""
 
 from .harness import EphemeralStore, Harness, WrapResult
-from .protocol import FORMAT_TEMPLATE, emit_look, format_spoken, parse_look_block, parse_pair
+from .protocol import (
+    FORMAT_TEMPLATE,
+    LOOK_UNAVAILABLE,
+    Spoken,
+    emit_look,
+    extract_spoken,
+    format_spoken,
+    pair_line,
+    parse_look_block,
+    parse_pair,
+)
 from .scan import Finding, scan_tree
 from .store import look, mint, observe, rotate
 from .verify import VerifyResult, verify_file, verify_text
@@ -15,13 +25,17 @@ __all__ = [
     "Finding",
     "FORMAT_TEMPLATE",
     "Harness",
+    "LOOK_UNAVAILABLE",
+    "Spoken",
     "VerifyResult",
     "WrapResult",
     "emit_look",
+    "extract_spoken",
     "format_spoken",
     "look",
     "mint",
     "observe",
+    "pair_line",
     "parse_look_block",
     "parse_pair",
     "rotate",

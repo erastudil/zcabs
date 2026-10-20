@@ -51,6 +51,18 @@ class ProtocolTests(unittest.TestCase):
         found = extract_spoken("all tests passed 847291")
         self.assertEqual(found, [])
 
+    def test_extract_zcabs_value_with_and_without_expected_string(self):
+        without_expected = extract_spoken("ZCABS_VALUE: 847291")
+        self.assertEqual(
+            [(s.string, s.integer, s.form) for s in without_expected],
+            [("zcabs_value", 847291, "zcabs_value")],
+        )
+        with_expected = extract_spoken("the apple number is 111111\nZCABS_VALUE: 847291", expected_string="banana")
+        self.assertEqual(
+            [(s.string, s.integer, s.form) for s in with_expected],
+            [("banana", 847291, "zcabs_value")],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

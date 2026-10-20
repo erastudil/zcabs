@@ -7,14 +7,17 @@ import path from "node:path";
 
 import {
   FORMAT_TEMPLATE,
+  LOOK_UNAVAILABLE,
   createFsIO,
   createHarness,
   createMemoryIO,
   emitLook,
+  extractSpoken,
   formatSpoken,
   look,
   mint,
   observe,
+  pairLine,
   parseLookBlock,
   rotate,
   verify,
@@ -24,6 +27,8 @@ test("emitLook has template not a value", () => {
   const block = emitLook("store/f_abc.dat");
   assert.equal(block.includes("LOOK: store/f_abc.dat"), true);
   assert.equal(block.includes(FORMAT_TEMPLATE), true);
+  const unavail = parseLookBlock(emitLook(null));
+  assert.equal(unavail.look, LOOK_UNAVAILABLE);
 });
 
 test("mint look observe verify rotate", () => {
@@ -95,4 +100,20 @@ test("createHarness provides look observe verify wrap", () => {
   const canaryExpected = h.formatExpected("canary");
   assert.equal(h.verify(canaryExpected, "canary").ok, true);
 });
+
+test("extractSpoken and pairLine match Python protocol parity", () => {
+  assert.equal(pairLine("banana", 847291), "banana=847291\n");
+  assert.throws(() => pairLine("banana", 9999), /integer outside live range/);
+
+  const withoutExpected = extractSpoken("output ZCABS_VALUE: 847291");
+  assert.deepEqual(withoutExpected, [
+    { string: "zcabs_value", integer: 847291, form: "zcabs_value" },
+  ]);
+
+  const withExpected = extractSpoken("the apple number is 111111\nZCABS_VALUE: 847291", "banana");
+  assert.deepEqual(withExpected, [
+    { string: "banana", integer: 847291, form: "zcabs_value" },
+  ]);
+});
+
 
